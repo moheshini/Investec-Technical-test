@@ -1,0 +1,189 @@
+//First time working with a JSON file. I chose to write this code in Java using Netbeans as an IDE. 
+//I have not followed the question numbering very well. I have written methods to do the tasks given as efficiently as I could think of.
+//The user can either print all address, or one depending on type. 
+//Validation can be run on addresses and errors will be displayed.
+
+
+package javaapplication6;
+
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+/**
+ *
+ * @author moh_raj
+ */
+public class JavaApplication6
+{
+
+    //Prints all addresses in given format 
+    public static void prettyPrintAddresses(JSONArray array)
+    {
+        for (int i = 0; i < array.size(); i++)
+        {
+            JSONObject address = (JSONObject) array.get(i);
+            JSONObject type = (JSONObject) address.get("type");
+            Object get = type.get("code");
+            switch (get.toString())
+            {
+                case "1":
+                {
+                    printPhysical(address);
+                    break;
+                }
+                case "2":
+                {
+                    printPostal(address);
+                    break;
+                }
+                case "5":
+                {
+                    printBusiness(address);
+                    break;
+                }
+            }
+
+        }
+    }
+    // Prints addresses by type where type is given
+    public static void prettyPrintAddresses(JSONArray array, String printType)
+    {
+        for (int i = 0; i < array.size(); i++)
+        {
+            JSONObject address = (JSONObject) array.get(i);
+            JSONObject type = (JSONObject) address.get("type");
+            Object get = type.get("code");
+
+            if (printType.equals("physical") && get.toString().equals("1"))
+            {
+                printPhysical(address);
+            }
+            else if (printType.equals("postal") && get.toString().equals("2"))
+            {
+                printPostal(address);
+            }
+            else if (printType.equals("business") && get.toString().equals("5"))
+            {
+                printBusiness(address);
+            }
+        }
+    }
+
+    public static void printError(String error)
+    {
+        System.out.println("Address is invalid and may be caused by an invalid " + error);
+    }
+
+    
+    public static void addressValidation(JSONObject address)
+    {
+        String postalCode = (String) address.get("postalCode");
+        char[] toCharArray = postalCode.toCharArray();
+        boolean found = false;
+        for (int i = 0; i < toCharArray.length; i++)
+        {
+            boolean digit = Character.isDigit(toCharArray[0]);
+            if (digit == false)
+            {
+                found = true;
+            }
+            if (found)
+            {
+                printError("postal code");
+                break;
+            }
+        }
+
+        if (address.get("country") == null || address.get("country").equals(""))
+        {
+            printError("country");
+        }
+        else
+        {
+            JSONObject country = (JSONObject) address.get("country");
+            if (country.get("code").equals("ZA"))
+            {
+                if (address.get("provinceOrState") == null || address.get("provinceOrState").equals(""))
+                {
+                    printError("province");
+                }
+            }
+
+        }
+
+        HashMap lineDetail = (HashMap) address.get("addressLineDetail");
+        if (lineDetail == null)
+        {
+            printError("address line detail");
+        }
+        else
+        {
+            for (int i = 0; i < lineDetail.size(); i++)
+            {
+                if (lineDetail.get("line" + (i + 1)).equals(""))
+                {
+                    printError("address line detail");
+                }
+
+            }
+
+        }
+
+    }
+
+    public static void printPhysical(JSONObject physical)
+    {
+        JSONObject lineDetails = (JSONObject) physical.get("addressLineDetail");
+        JSONObject country = (JSONObject) physical.get("country");
+        JSONObject province = (JSONObject) physical.get("provinceOrState");
+
+        System.out.println("Type: Physical Address - " + lineDetails.get("line1") + " " + lineDetails.get("line2")
+                + " - " + physical.get("cityOrTown") + " - " + province.get("name") + " - " + physical.get("postalCode") + " - " + country.get("name"));
+    }
+
+    public static void printPostal(JSONObject postal)
+    {
+        JSONObject country = (JSONObject) postal.get("country");
+        System.out.println("Type: Postal Address - "
+                + postal.get("cityOrTown") + " - " + postal.get("postalCode") + " - " + country.get("name"));
+    }
+
+    public static void printBusiness(JSONObject business)
+    {
+        JSONObject country = (JSONObject) business.get("country");
+        JSONObject lineDetails = (JSONObject) business.get("addressLineDetail");
+
+        System.out.println("Type: Business Address - " + lineDetails.get("line1") + " " + lineDetails.get("line2")
+                + " - " + business.get("cityOrTown") + " - " + business.get("postalCode") + " - " + country.get("name"));
+    }
+
+    /**
+     * @param args the command line arguments
+     * @throws org.json.simple.parser.ParseException
+     */
+    public static void main(String[] args) throws org.json.simple.parser.ParseException
+    {
+        JSONParser parser = new JSONParser();
+
+        try
+        {
+            Object obj = parser.parse(new FileReader("C:\\Users\\moh_raj\\Downloads\\addresses.json"));
+            JSONArray array = (JSONArray) obj;
+            addressValidation((JSONObject) array.get(2));
+
+            
+        }
+        catch (FileNotFoundException e)
+        {
+        }
+        catch (IOException e)
+        {
+        }
+    }
+
+}
