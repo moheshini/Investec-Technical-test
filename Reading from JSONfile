@@ -1,7 +1,7 @@
 //First time working with a JSON file. I chose to write this code in Java using Netbeans as an IDE. 
 //I have not followed the question numbering very well. I have written methods to do the tasks given as efficiently as I could think of.
 //The user can either print all address, or one depending on type. 
-//Validation can be run on addresses and errors will be displayed.
+//Validation can be run on addresses and errors will be displayed. Message box error display can also be used here. 
 
 
 package javaapplication6;
@@ -138,11 +138,18 @@ public class JavaApplication6
 
     public static void printPhysical(JSONObject physical)
     {
-        JSONObject lineDetails = (JSONObject) physical.get("addressLineDetail");
+        HashMap lineDetails = (HashMap) physical.get("addressLineDetail");
+        String addressDetail = " ";
+        for (int i = 0; i < lineDetails.size(); i++)
+        {
+            addressDetail += lineDetails.get("line"+(i+1)).toString()+" ";
+            
+        }
+               
         JSONObject country = (JSONObject) physical.get("country");
         JSONObject province = (JSONObject) physical.get("provinceOrState");
 
-        System.out.println("Type: Physical Address - " + lineDetails.get("line1") + " " + lineDetails.get("line2")
+        System.out.println("Type: Physical Address - " + addressDetail
                 + " - " + physical.get("cityOrTown") + " - " + province.get("name") + " - " + physical.get("postalCode") + " - " + country.get("name"));
     }
 
