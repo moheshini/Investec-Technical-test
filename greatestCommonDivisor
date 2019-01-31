@@ -1,3 +1,8 @@
+//The recursive gcd is most common. I initially wanted to do this a different way. 
+//Sort the number and mod the second number by the first. If it is 0 then the try all the other numbers with the smallest. 
+//If they all divide then, you have your GCD. If not, it is 1. Unit test failed and logic failed when faced with something like {6,9,12}
+//So I went for the usual gcd method of solving the problem.
+
 package javaapplication4;
 
 /**
